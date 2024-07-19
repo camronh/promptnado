@@ -1,6 +1,6 @@
 from pydantic.v1 import BaseModel, Field
-from typing import List
-
+from typing import List, Union, Optional
+from langchain.schema import BaseMessage
 
 class Rule(BaseModel):
     """A single rule for the prompt"""
@@ -21,3 +21,9 @@ class CorrectnessEvaluationResult(BaseModel):
     reasoning: str = Field(
         ..., description="The thought process behind why you think the answer is correct or incorrect.")
     correct: bool = Field(..., description="Correctness score")
+
+
+class Example(BaseModel):
+    """An example of a prompt"""
+    input: Union[str, List[BaseMessage]] # A string or Langchain message list
+    reference_output: Optional[str] = None # The reference output for the example in the dataset
