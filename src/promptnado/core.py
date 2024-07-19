@@ -159,7 +159,8 @@ PROMPTING TIPS:
         else:
             reference_example = ""
 
-        system_prompt = f"""Your job is to validate whether the <Result> meets the criteria for <Instruction>. Try to be a harsh judge.
+        system_prompt = f"""Your job is to validate whether the <Result> meets the criteria for <Instruction>. Try to be a harsh judge. \
+If you are not sure, try to be conservative and say that the result does not meet the criteria, and explain why.
 
 <Instruction>
 {self.instruction}
