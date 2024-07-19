@@ -41,6 +41,7 @@ class LangsmithDataset(BaseModel):
     dataset_id: Optional[UUID] = None
     input_messages_key: str = "inputs"
     reference_output_key: str = "output"
+    args_key: str = "args"
     dataset: Optional[Dataset] = None
 
     def __init__(self, **data):
