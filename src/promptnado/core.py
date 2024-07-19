@@ -1,3 +1,6 @@
+from .schemas import Rule, Rules, CorrectnessEvaluationResult, Example, LangsmithDataset
+from langchain.schema import SystemMessage, HumanMessage, BaseMessage, AIMessage
+from langsmith import Client
 from typing import List, Union
 import random
 from langsmith.schemas import Run, Example as DatasetExample
@@ -6,10 +9,7 @@ from langchain.chat_models import init_chat_model
 from dotenv import load_dotenv
 load_dotenv()
 
-from langsmith import Client
 client = Client()
-from langchain.schema import SystemMessage, HumanMessage, BaseMessage, AIMessage
-from .schemas import Rule, Rules, CorrectnessEvaluationResult, Example
 
 
 class Promptnado:
@@ -18,7 +18,9 @@ class Promptnado:
                  rule_gen_model=init_chat_model(
                      "gpt-4o-mini", temperature=0.7),
                  eval_model=init_chat_model("gpt-4o-mini", temperature=0.7),
-                 prediction_model=init_chat_model("gpt-4o-mini", temperature=0.7)):
+                 prediction_model=init_chat_model(
+                     "gpt-4o-mini", temperature=0.7),
+                 dataset: LangsmithDataset = None):
 
         # rule_token is not in the prompt throw
         if rule_token not in system_prompt:
@@ -30,8 +32,12 @@ class Promptnado:
         self.examples = examples
         self.rule_token = rule_token
 
-        # Create random dataset name
-        self.dataset_name = f"Promptnado_{random.randint(0, 1000000)}"
+        if dataset:
+            self.dataset = dataset
+            self.dataset_name = dataset.dataset.name
+        else:
+            # Create random dataset name
+            self.dataset_name = f"Promptnado_{random.randint(0, 1000000)}"
 
         self.attempts = 1
         self.solved = False
@@ -77,6 +83,9 @@ class Promptnado:
         print(
             f"Created dataset: {self.dataset_name} with {len(self.examples)} examples")
         print(dataset.url)
+        self.dataset = LangsmithDataset(
+            dataset_name=dataset.name, dataset_id=dataset.id, dataset=dataset)
+        return self.dataset
 
     def _generate_rules(self):
         """Use an LLM to generate a list of rules"""
@@ -204,7 +213,7 @@ examples.
 
         results = evaluate(
             self._predict,
-            data=self.dataset_name,
+            data=self.dataset.dataset.name,
             evaluators=[self._evaluate_correctness],
             experiment_prefix=f"Attempt-{self.attempts}",
         )
@@ -216,7 +225,11 @@ examples.
     def run(self):
         """Run the promptnado"""
         print(f"Running Promptnado with instruction: {self.instruction}")
-        self._create_dataset()
+        if not self.dataset:
+            self._create_dataset()
+        else:
+            print(f"Using existing dataset: {self.dataset.dataset.name}")
+            print(self.dataset.dataset.url)
 
         while not self.solved and self.attempts < self.max_attempts:
             try:
@@ -239,4 +252,4 @@ examples.
 
         print(
             f"Successful prompt:\n====================\n{self.current_prompt}\n=================")
-        print(self.results._manager._experiment.url)
+        print(self.dataset.dataset.url)

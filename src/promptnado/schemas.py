@@ -1,6 +1,9 @@
 from pydantic.v1 import BaseModel, Field
 from typing import List, Union, Optional
 from langchain.schema import BaseMessage
+from langsmith import Client
+from langsmith.schemas import Dataset
+
 
 class Rule(BaseModel):
     """A single rule for the prompt"""
@@ -25,5 +28,33 @@ class CorrectnessEvaluationResult(BaseModel):
 
 class Example(BaseModel):
     """An example of a prompt"""
-    input: Union[str, List[BaseMessage]] # A string or Langchain message list
-    reference_output: Optional[str] = None # The reference output for the example in the dataset
+    input: Union[str, List[BaseMessage]]  # A string or Langchain message list
+    # The reference output for the example in the dataset
+    reference_output: Optional[str] = None
+
+
+
+class LangsmithDataset(BaseModel):
+    """An already existing Langsmith Dataset"""
+    dataset_name: Optional[str] = None
+    dataset_id: Optional[str] = None
+    input_messages_key: str = "inputs"
+    output_messages_key: str = "output"
+    dataset: Optional[Dataset] = None
+
+    def __init__(self, **data):
+        super().__init__(**data)
+        self._initialize_dataset()
+
+    def _initialize_dataset(self):
+        client = Client()
+        try:
+            if self.dataset_name:
+                self.dataset = client.read_dataset(dataset_name=self.dataset_name)
+            elif self.dataset_id:
+                self.dataset = client.read_dataset(dataset_id=self.dataset_id)
+            elif not self.dataset:
+                raise ValueError("Must provide either dataset_name or dataset_id")
+        except Exception as e:
+            print(f"Error initializing dataset: {e}")
+            raise e
