@@ -154,15 +154,16 @@ examples.
     def _predict(self, inputs: dict):
         """Run current prompt against example in the dataset"""
         try:
-            if isinstance(inputs["inputs"], str):
+            input_key = self.dataset.input_messages_key
+            if isinstance(inputs[input_key], str):
                 messages = [
                     SystemMessage(content=self.current_prompt),
-                    HumanMessage(content=inputs["inputs"]),
+                    HumanMessage(content=inputs[input_key]),
                 ]
 
-            elif isinstance(inputs["inputs"], list):
+            elif isinstance(inputs[input_key], list):
                 messages = [SystemMessage(content=self.current_prompt)]
-                for msg_dict in inputs["inputs"]:
+                for msg_dict in inputs[input_key]:
                     if isinstance(msg_dict, dict):
                         if msg_dict["type"] == "human":
                             messages.append(HumanMessage(**msg_dict))
