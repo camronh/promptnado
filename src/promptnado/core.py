@@ -65,7 +65,7 @@ class Promptnado:
         for example in self.examples:
             if isinstance(example, dict):
                 client.create_example(
-                    inputs={"inputs": {self.dataset.args_key: example}}, dataset_id=dataset.id)
+                    inputs={"inputs": {"args": example}}, dataset_id=dataset.id)
             elif isinstance(example, str):
                 client.create_example(
                     inputs={"inputs": example}, dataset_id=dataset.id)
@@ -193,7 +193,7 @@ If you are not sure, try to be conservative and say that the result does not mee
             input_key = self.dataset.input_messages_key
             if isinstance(inputs[input_key], dict):
                 messages = [SystemMessage(
-                    content=self.current_prompt.format(**inputs[input_key]))]
+                    content=self.current_prompt.format(**inputs[input_key][self.dataset.args_key]))]
 
             elif isinstance(inputs[input_key], str):
                 messages = [SystemMessage(content=self.current_prompt)]
@@ -226,6 +226,10 @@ If you are not sure, try to be conservative and say that the result does not mee
 
         except Exception as e:
             print(f"Error predicting: {e}")
+            print(f"Input: {inputs}")
+            print(f"args: {inputs[input_key][self.dataset.args_key]}")
+            print(f"Current prompt: {self.current_prompt}")
+            print(f"Current rule: {self.current_rule}")
             raise e
 
     def _is_solved(self, eval_results):
