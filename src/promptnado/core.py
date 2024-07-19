@@ -6,7 +6,7 @@ import random
 from langsmith.schemas import Run, Example as DatasetExample
 from langsmith import evaluate
 from langchain.chat_models import init_chat_model
-from .utils import format_rules
+from .utils import format_rules, generate_examples
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -56,6 +56,12 @@ class Promptnado:
         self.eval_model = eval_model
         self.prediction_model = prediction_model
         self.max_attempts = max_attempts
+
+    def generate_examples(self, count=3, arg_schema=None):
+        """Generate Synthetic examples and add them to the `examples` list"""
+        examples = generate_examples(self.system_prompt, self.instruction, count=count, arg_schema=arg_schema)
+        self.examples.extend(examples)
+        return examples
 
     def _create_dataset(self):
         """Create a dataset with a unique name"""
