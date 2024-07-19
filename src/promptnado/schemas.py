@@ -1,5 +1,6 @@
 from pydantic.v1 import BaseModel, Field
 from typing import List, Union, Optional
+from uuid import UUID
 from langchain.schema import BaseMessage
 from langsmith import Client
 from langsmith.schemas import Dataset
@@ -37,7 +38,7 @@ class Example(BaseModel):
 class LangsmithDataset(BaseModel):
     """An already existing Langsmith Dataset"""
     dataset_name: Optional[str] = None
-    dataset_id: Optional[str] = None
+    dataset_id: Optional[UUID] = None
     input_messages_key: str = "inputs"
     reference_output_key: str = "output"
     dataset: Optional[Dataset] = None

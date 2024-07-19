@@ -20,7 +20,8 @@ class Promptnado:
                  eval_model=init_chat_model("gpt-4o-mini", temperature=0.7),
                  prediction_model=init_chat_model(
                      "gpt-4o-mini", temperature=0.7),
-                 dataset: LangsmithDataset = None):
+                 dataset: LangsmithDataset = None,
+                 experiment_name=None):
 
         # rule_token is not in the prompt throw
         if rule_token not in system_prompt:
@@ -37,7 +38,8 @@ class Promptnado:
             self.dataset_name = dataset.dataset.name
         else:
             # Create random dataset name
-            self.dataset_name = f"Promptnado_{random.randint(0, 1000000)}"
+            self.dataset_name = f"{experiment_name or 'Promptnado'}_{random.randint(0, 1000000)}"
+            self.dataset = None
 
         self.attempts = 1
         self.solved = False
