@@ -14,7 +14,8 @@ client = Client()
 
 
 class Promptnado:
-    def __init__(self, system_prompt: str, instruction: str, examples: List[Union[str, Example, List[BaseMessage]]],
+    def __init__(self, system_prompt: str, instruction: str, 
+                 examples: List[Union[str, Example, List[BaseMessage]]] = [""],
                  rule_token="<HERE>", max_attempts=10,
                  rule_gen_model=init_chat_model(
                      "gpt-4o-mini", temperature=0.7),
@@ -59,6 +60,7 @@ class Promptnado:
         """Create a dataset with a unique name"""
         dataset = client.create_dataset(
             self.dataset_name, description=self.instruction)
+
         for example in self.examples:
             if isinstance(example, str):
                 client.create_example(
