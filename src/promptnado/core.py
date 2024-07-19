@@ -14,7 +14,7 @@ client = Client()
 
 
 class Promptnado:
-    def __init__(self, system_prompt: str, instruction: str, 
+    def __init__(self, system_prompt: str, instruction: str,
                  examples: List[Union[str, Example, List[BaseMessage]]] = [""],
                  rule_token="<HERE>", max_attempts=10,
                  rule_gen_model=init_chat_model(
@@ -188,10 +188,9 @@ If you are not sure, try to be conservative and say that the result does not mee
         try:
             input_key = self.dataset.input_messages_key
             if isinstance(inputs[input_key], str):
-                messages = [
-                    SystemMessage(content=self.current_prompt),
-                    HumanMessage(content=inputs[input_key]),
-                ]
+                messages = [SystemMessage(content=self.current_prompt)]
+                if inputs[input_key] != "":  # If empty input, dont add it as a message
+                    messages.append(HumanMessage(content=inputs[input_key]))
 
             elif isinstance(inputs[input_key], list):
                 messages = [SystemMessage(content=self.current_prompt)]
