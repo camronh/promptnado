@@ -39,7 +39,7 @@ class LangsmithDataset(BaseModel):
     dataset_name: Optional[str] = None
     dataset_id: Optional[str] = None
     input_messages_key: str = "inputs"
-    output_messages_key: str = "output"
+    reference_output_key: str = "output"
     dataset: Optional[Dataset] = None
 
     def __init__(self, **data):

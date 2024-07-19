@@ -125,9 +125,9 @@ examples.
         """Eval function to use an LLM to validate that the instruction was followed"""
 
         # Add reference output if it exists
-        if example.outputs and example.outputs.get("output"):
+        if example.outputs and example.outputs.get(self.dataset.reference_output_key):
             reference_example = f"""\n<Example Output>
-{example.outputs["output"]}
+{example.outputs[self.dataset.reference_output_key]}
 </Example Output>\n"""
         else:
             reference_example = ""
