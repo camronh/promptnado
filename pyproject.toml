@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "promptnado"
+version = "0.1.0"
+description = "A framework for iterating on system prompts using evaluations"
+authors = [{name = "Camron H", email = "camronhaider@gmail.com"}]
+license = {file = "LICENSE"}
+readme = "README.md"
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "langsmith",
+    "pydantic>=1.8,<3.0",
+    "python-dotenv",
+    "langchain",
+    "langchain-openai",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["promptnado*"]
+exclude = ["tests*"]
+
+[project.urls]
+"Homepage" = "https://github.com/camronh/promptnado"
+"Bug Tracker" = "https://github.com/camronh/promptnado/issues"
