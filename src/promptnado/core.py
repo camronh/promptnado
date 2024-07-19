@@ -22,7 +22,8 @@ class Promptnado:
                  prediction_model=init_chat_model(
                      "gpt-4o-mini", temperature=0.7),
                  dataset: LangsmithDataset = None,
-                 experiment_name=None):
+                 experiment_name=None,
+                 max_concurrency=None):
 
         # rule_token is not in the prompt throw
         if rule_token not in system_prompt:
@@ -34,6 +35,7 @@ class Promptnado:
         self.examples = examples
         self.rule_token = rule_token
         self.all_rules = []
+        self.max_concurrency = max_concurrency
 
         if dataset:
             self.dataset = dataset
@@ -245,6 +247,7 @@ If you are not sure, try to be conservative and say that the result does not mee
             data=self.dataset.dataset.name,
             evaluators=[self._evaluate_correctness],
             experiment_prefix=f"Attempt-{self.attempts}",
+            max_concurrency=self.max_concurrency
         )
 
         self.attempts += 1
