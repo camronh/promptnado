@@ -9,7 +9,7 @@ load_dotenv()
 from langsmith import Client
 client = Client()
 from langchain.schema import SystemMessage, HumanMessage, BaseMessage, AIMessage
-from src.promptnado.schemas import Rule, Rules, CorrectnessEvaluationResult, Example
+from .schemas import Rule, Rules, CorrectnessEvaluationResult, Example
 
 
 class Promptnado:
@@ -72,7 +72,7 @@ class Promptnado:
                     inputs={"inputs": example}, dataset_id=dataset.id)
             else:
                 raise ValueError(
-                    "Invalid example format. Must be a string, Example, or a list of BaseMessages.")
+                    f"Invalid example format. Must be a string, Example, or a list of BaseMessages.\nActual Type: {type(example)}")
 
         print(
             f"Created dataset: {self.dataset_name} with {len(self.examples)} examples")
