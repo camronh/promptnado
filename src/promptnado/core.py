@@ -6,6 +6,7 @@ import random
 from langsmith.schemas import Run, Example as DatasetExample
 from langsmith import evaluate
 from langchain.chat_models import init_chat_model
+from .utils import format_rules
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -32,6 +33,7 @@ class Promptnado:
         self.instruction = instruction
         self.examples = examples
         self.rule_token = rule_token
+        self.all_rules = []
 
         if dataset:
             self.dataset = dataset
@@ -93,13 +95,35 @@ class Promptnado:
         """Use an LLM to generate a list of rules"""
 
         system_prompt = f"""You are an expert LLM Prompt Engineer. Your job is to try to solve for the provided <Instructions> \
-by making adjustments to the <Original Prompt>. You should attempt to make 5 suggestions for prompts that might work. Each suggestion you \
+by making adjustments to the <Original Prompt>. You should attempt to make up to 5 suggestions for prompts that might work. Each suggestion you \
 make will be interpolated into the prompt where {self.rule_token} is, and then evaluated for correctness against a dataset of \
 examples.
+
+GUIDELINES:
+- You must make up to 5 suggestions for prompts that might work.
+- Gradually increase the complexity of your suggestions. Your first suggestion should be the simplest one that you think might work, and your last suggestion should be the most complex one that you think might work.
+- Your reasoning should explain why you think this prompt would work and what makes it different from your other attempts.
+- You must provide a prompt for each suggestion.
+- Try to generate a diverse set of rules. Each one should be different from the others.
+- Only make adjustments to where you see {self.rule_token} in the <Original Prompt>. No other part of the prompt will be changed.
+- Your `prompt` will be interpolated to the {self.rule_token} verbatim, so if there is formatting to be accounted for, make sure to include it.
+- If some other prompt <ATTEMPTS> are included, try to go a different direction than the previous attempts unless you can't think of a new one. In that case, try to improve on the previous attempts.
+- Try to keep your reasoning pretty short. No need to be too detailed.
+- MAKE SURE your prompts are specific to the <Instructions>. Be careful to avoid adding any instructions that may effect behavior not mentioned in the <Instructions>. For example, don't mention conciseness if its not explicitly mentioned in the <Instructions>.
+
+
+
+PROMPTING TIPS:
+- Simple is almost always better. Only if a simple option doesn't work should you consider more complex options.
+- Capitalization can be used to put emphasis on certain words. For example "NEVER" or "ALWAYS".
+- Providing an example can help with some subtleties. If you ever need to show what you mean instead of just saying it, a very brief inline example can help.
+- Consider the entire <Original Prompt> when making your suggestions, there might be some other parts of the prompt that may play a part in the behavior we are expecting. 
 
 <Instructions>
 {self.instruction}
 </Instructions>
+
+{format_rules(self.all_rules) if self.all_rules else ""}
 
 <Original Prompt>
 {self.system_prompt}
@@ -111,6 +135,7 @@ examples.
         rules: Rules = structured_llm.invoke(system_prompt)
 
         self.rules = rules.rules
+        self.all_rules.extend(rules.rules)
         print(f"Generated {len(self.rules)} rules\n")
         print(self.rules)
         return self.rules
