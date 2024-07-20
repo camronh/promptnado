@@ -283,7 +283,7 @@ If you are not sure, try to be conservative and say that the result does not mee
             print(f"Using existing dataset: {self.dataset.dataset.name}")
             print(self.dataset.dataset.url)
 
-        while not self.solved and self.attempts < self.max_attempts:
+        while not self.solved and self.attempts <= self.max_attempts:
             try:
                 self._generate_rules()
                 for rule in self.rules:
