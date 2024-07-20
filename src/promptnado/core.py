@@ -59,7 +59,8 @@ class Promptnado:
 
     def generate_examples(self, count=3, arg_schema=None):
         """Generate Synthetic examples and add them to the `examples` list"""
-        examples = generate_examples(self.system_prompt, self.instruction, count=count, arg_schema=arg_schema)
+        examples = generate_examples(
+            self.system_prompt, self.instruction, count=count, arg_schema=arg_schema)
         self.examples.extend(examples)
         return examples
 
@@ -300,7 +301,14 @@ If you are not sure, try to be conservative and say that the result does not mee
                 return  # Exit the while loop on error
 
         print("\n\nSolved!! Current prompt can be found at `self.successful_prompt`\n\n")
+        # ANSI escape codes for green text and reset
+        GREEN = "\033[92m"
+        RESET = "\033[0m"
+        
+        green_rule = f"{GREEN}{self.current_rule.prompt}{RESET}"
+        highlighted_prompt = self.system_prompt.replace(
+            self.rule_token, green_rule)
 
         print(
-            f"Successful prompt:\n====================\n{self.current_prompt}\n=================")
+            f"Successful prompt:\n====================\n{highlighted_prompt}\n=================")
         print(self.dataset.dataset.url)
