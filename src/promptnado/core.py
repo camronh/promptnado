@@ -16,7 +16,7 @@ client = Client()
 class Promptnado:
     def __init__(self, system_prompt: str, instruction: str,
                  examples: List[Union[str, dict,
-                                      Example, List[BaseMessage]]] = [""],
+                                      Example, List[BaseMessage]]] = [],
                  rule_token="<HERE>", max_attempts=10,
                  rule_gen_model=init_chat_model(
                      "gpt-4o-mini", temperature=0.7),
@@ -24,8 +24,8 @@ class Promptnado:
                  prediction_model=init_chat_model(
                      "gpt-4o-mini", temperature=0.7),
                  dataset: LangsmithDataset = None,
-                 experiment_name=None,
-                 max_concurrency=None):
+                 experiment_name: str = None,
+                 max_concurrency: int = None):
 
         # rule_token is not in the prompt throw
         if rule_token not in system_prompt:
@@ -68,8 +68,10 @@ class Promptnado:
         """Create a dataset with a unique name"""
         dataset = client.create_dataset(
             self.dataset_name, description=self.instruction)
+        
+        examples = self.examples if self.examples else [""]
 
-        for example in self.examples:
+        for example in examples:
             if isinstance(example, dict):
                 client.create_example(
                     inputs={"inputs": {"args": example}}, dataset_id=dataset.id)
@@ -100,7 +102,7 @@ class Promptnado:
                     f"Invalid example format. Must be a string, Example, or a list of BaseMessages.\nActual Type: {type(example)}")
 
         print(
-            f"Created dataset: {self.dataset_name} with {len(self.examples)} examples")
+            f"Created dataset: {self.dataset_name} with {len(examples)} examples")
         print(dataset.url)
         self.dataset = LangsmithDataset(
             dataset_name=dataset.name, dataset_id=dataset.id, dataset=dataset)
@@ -232,11 +234,6 @@ If you are not sure, try to be conservative and say that the result does not mee
             return {"output": response.content}
 
         except Exception as e:
-            print(f"Error predicting: {e}")
-            print(f"Input: {inputs}")
-            print(f"args: {inputs[input_key][self.dataset.args_key]}")
-            print(f"Current prompt: {self.current_prompt}")
-            print(f"Current rule: {self.current_rule}")
             raise e
 
     def _is_solved(self, eval_results):
@@ -304,7 +301,7 @@ If you are not sure, try to be conservative and say that the result does not mee
         # ANSI escape codes for green text and reset
         GREEN = "\033[92m"
         RESET = "\033[0m"
-        
+
         green_rule = f"{GREEN}{self.current_rule.prompt}{RESET}"
         highlighted_prompt = self.system_prompt.replace(
             self.rule_token, green_rule)

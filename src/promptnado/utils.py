@@ -59,6 +59,7 @@ GUIDELINES:
 general ability, or ability to follow the <System Prompt>. We are specifically looking to see if it is able to follow the <Instructions>. The \
 <System Prompt> is just for added context to generate better examples.
 - The LLM's outputs will be evaluated ONLY based on the <Instructions> so make sure the examples are directly relevant to the instructions.
+- Include at least one "Happy path" example that is less challenging than the others.
 
 <Instructions>
 {instructions}
