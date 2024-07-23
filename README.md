@@ -1,8 +1,5 @@
 # 🌪️ Promptnado: Your AI-Powered Prompt Engineer
 
-[![PyPI version](https://badge.fury.io/py/promptnado.svg)](https://badge.fury.io/py/promptnado)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-
 Meet Promptnado – your personal AI prompt engineer! 🚀 By harnessing the power of AI, Promptnado acts as your personal AI prompt engineer, automatically generating, testing, and refining prompts to meet your specific criteria. Say goodbye to manual prompt tweaking and hello to AI-driven prompting!
 
 ## 🌟 Features
