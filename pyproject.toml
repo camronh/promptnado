@@ -1,33 +1,29 @@
-[build-system]
-requires = ["setuptools>=61.0", "wheel"]
-build-backend = "setuptools.build_meta"
+[tool.poetry.urls]
+"Homepage" = "https://github.com/camronh/promptnado"
+"Bug Tracker" = "https://github.com/camronh/promptnado/issues"
 
-[project]
+[tool.poetry]
 name = "promptnado"
 version = "0.1.0"
 description = "A framework for iterating on system prompts using evaluations"
-authors = [{name = "Camron H", email = "camronhaider@gmail.com"}]
-license = {file = "LICENSE"}
+authors = ["Camron H <camron.haider@gmail.com>"]
+license = "MIT"
 readme = "README.md"
-requires-python = ">=3.7"
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
-dependencies = [
-    "langsmith",
-    "pydantic>=1.8,<3.0",
-    "python-dotenv",
-    "langchain",
-    "langchain-openai",
-]
+packages = [{ include = "promptnado*", from = "src" }]
 
-[tool.setuptools.packages.find]
-where = ["src"]
-include = ["promptnado*"]
-exclude = ["tests*"]
+[tool.poetry.dependencies]
+python = ">=3.8.1,<3.12"
+langsmith = "*"
+pydantic = "^1.8,<3.0"
+python-dotenv = "*"
+langchain = "*"
+langchain-openai = "*"
 
-[project.urls]
-"Homepage" = "https://github.com/camronh/promptnado"
-"Bug Tracker" = "https://github.com/camronh/promptnado/issues"
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
