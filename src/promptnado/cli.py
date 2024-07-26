@@ -6,7 +6,7 @@ from typing import Optional
 app = typer.Typer()
 
 @app.command()
-def promptnado(
+def run(
     system_prompt: str = typer.Option(..., help="The system prompt to use."),
     instruction: str = typer.Option(..., help="Instruction for the prompt."),
     rule_token: str = typer.Option("<HERE>", help="Token to indicate rule insertion point."),
