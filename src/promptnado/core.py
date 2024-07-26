@@ -36,7 +36,7 @@ class Promptnado:
         self.instruction = instruction
         self.examples = examples
         self.rule_token = rule_token
-        self.all_rules = []
+        self.tested_rules = []
         self.max_concurrency = max_concurrency
 
         if dataset:
@@ -68,7 +68,7 @@ class Promptnado:
         """Create a dataset with a unique name"""
         dataset = client.create_dataset(
             self.dataset_name, description=self.instruction)
-        
+
         examples = self.examples if self.examples else [""]
 
         for example in examples:
@@ -140,7 +140,7 @@ PROMPTING TIPS:
 {self.instruction}
 </Instructions>
 
-{format_rules(self.all_rules) if self.all_rules else ""}
+{format_rules(self.tested_rules) if self.tested_rules else ""}
 
 <Original Prompt>
 {self.system_prompt}
@@ -152,10 +152,15 @@ PROMPTING TIPS:
         rules: Rules = structured_llm.invoke(system_prompt)
 
         self.rules = rules.rules
-        self.all_rules.extend(rules.rules)
+        # self.tested_rules.extend(rules.rules)
         print(f"Generated {len(self.rules)} rules\n")
         print(self.rules)
         return self.rules
+
+    def _next_rule(self):
+        """Get the next rule to test"""
+        self.current_rule = self.rules.pop(0)
+        self.current_prompt = self._build_prompt(self.current_rule)
 
     def _build_prompt(self, rule: Rule):
         """Interpolate the rules into the system prompt"""
@@ -257,7 +262,7 @@ If you are not sure, try to be conservative and say that the result does not mee
         print(f'\nTesting rule: "{rule.prompt}"')
         self.current_rule = rule
 
-        self.current_prompt = self._build_prompt(self.current_rule)
+        self.current_prompt = self.current_prompt
 
         results = evaluate(
             self._predict,
