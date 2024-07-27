@@ -48,7 +48,7 @@ class Promptnado:
             self.dataset_name = f"{experiment_name or 'Promptnado'}_{random.randint(0, 1000000)}"
             self.dataset = None
 
-        self.attempts = 1
+        self.attempts = 0
         self.solved = False
         self.current_rule = None
         self.current_prompt = None
