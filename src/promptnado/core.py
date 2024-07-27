@@ -8,6 +8,7 @@ from langsmith import evaluate
 from langchain.chat_models import init_chat_model
 from .utils import format_rules, generate_examples
 from dotenv import load_dotenv
+from .graph import create_graph
 load_dotenv()
 
 client = Client()
@@ -56,6 +57,7 @@ class Promptnado:
         self.eval_model = eval_model
         self.prediction_model = prediction_model
         self.max_attempts = max_attempts
+        self.app = create_graph(self)
 
     def generate_examples(self, count=3, arg_schema=None):
         """Generate Synthetic examples and add them to the `examples` list"""
@@ -274,9 +276,49 @@ If you are not sure, try to be conservative and say that the result does not mee
 
         self.attempts += 1
 
+        if self._is_solved(results):
+            self.solved = True
+            self.results = results
+            self.successful_prompt = self.current_prompt
+
         return results
 
     def run(self):
+        """Run the promptnado"""
+        print(f"Running Promptnado with instruction: {self.instruction}")
+        if not self.dataset:
+            self._create_dataset()
+        else:
+            print(f"Using existing dataset: {self.dataset.dataset.name}")
+            print(self.dataset.dataset.url)
+
+        output = self.app.invoke({"instructions": self.instruction})
+
+        return output
+
+        while not self.solved and self.attempts <= self.max_attempts:
+            try:
+                self._generate_rules()
+                for rule in self.rules:
+                    if self.attempts > self.max_attempts:
+                        print("Max attempts reached")
+                        return
+                    results = self._test_rule(rule)
+                    if self._is_solved(results):
+                        self.results = results
+                        self.solved = True
+                        self.successful_prompt = self.current_prompt
+                        break
+            except Exception as e:
+                print(f"Fatal error encountered: {e}")
+                return  # Exit the while loop on error
+
+        print("\n\nSolved!! Current prompt can be found at `self.successful_prompt`\n\n")
+        # ANSI escape codes for green text and reset
+        GREEN = "\033[92m"
+        RESET = "\033[0m"
+
+    def __run(self):
         """Run the promptnado"""
         print(f"Running Promptnado with instruction: {self.instruction}")
         if not self.dataset:

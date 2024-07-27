@@ -1,23 +1,23 @@
 from langgraph.graph import StateGraph, START, END
 from typing import List, TypedDict
 from .schemas import Rule
-from .core import Promptnado
 
 
 class State(TypedDict):
-    # List of rules that have not been tested yet
-    untested_rules: List[Rule]
-    tested_rules: List[Rule]           # List of rules that have been tested
     current_rule: Rule                 # The rule currently being tested
     current_prompt: str               # The prompt associated with the current rule
+    instructions: str               # Instructions for the promptnado
+    # List of rules that have not been tested yet
+    untested_rules: List[Rule]
     solved: bool                   # Indicates whether the current rule has solved the problem
     attempt: int               # The number of attempts made with the current rule
     successful_prompt: str  # The prompt that was successful, if any
+    tested_rules: List[Rule]           # List of rules that have been tested
     # test_results: List[str]           # Results of each test performed
 
 
 class Nodes:
-    def __init__(self, pn: Promptnado):
+    def __init__(self, pn):
         self.pn = pn
 
     # Nodes
@@ -34,8 +34,7 @@ class Nodes:
         # Pop rule from state["rules"]
         current_rule = state["current_rule"]
         results = self.pn._test_rule(current_rule)
-        solved = self.pn._is_solved(results)
-        return {"solved": solved, "attempt": state["attempt"] + 1, "successful_prompt": self.pn.current_prompt}
+        return {"solved": self.pn.solved, "current_prompt": self.pn.current_prompt, "attempt": self.pn.attempts}
 
     def success(self, state: State):
         print("\n\nSolved!! Current prompt can be found at `self.successful_prompt`\n\n")
@@ -50,7 +49,7 @@ class Nodes:
         print(
             f"Successful prompt:\n====================\n{highlighted_prompt}\n=================")
         print(self.pn.dataset.dataset.url)
-        return {"current_rule": self.pn.current_rule, "current_prompt": self.pn.current_prompt, "solved": True, "attempts": self.pn.attempts}
+        return {"current_rule": self.pn.current_rule, "successful_prompt": self.pn.successful_prompt, "solved": True, "attempts": self.pn.attempts}
 
     def failure(self, state: State):
         return {"tested_rules": self.pn.tested_rules, "solved": False, "attempts": self.pn.attempts}
@@ -71,7 +70,7 @@ class Nodes:
         return "next"
 
 
-def create_graph(pn: Promptnado):
+def create_graph(pn):
     graph = StateGraph(State)
     nodes = Nodes(pn)
 
