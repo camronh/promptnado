@@ -264,7 +264,8 @@ If you are not sure, try to be conservative and say that the result does not mee
         print(f'\nTesting rule: "{rule.prompt}"')
         self.current_rule = rule
 
-        self.current_prompt = self.current_prompt
+        # Build the prompt for this rule so prediction uses the latest value
+        self.current_prompt = self._build_prompt(rule)
 
         results = evaluate(
             self._predict,
